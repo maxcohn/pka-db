@@ -4,10 +4,10 @@ CREATE TABLE IF NOT EXISTS `shows` (
 	`name`	TEXT,
 	PRIMARY KEY(`show_id`)
 );
-CREATE TABLE IF NOT EXISTS `people` (
-	`person_id`	INTEGER,
+CREATE TABLE IF NOT EXISTS `guests` (
+	`guest_id`	INTEGER,
 	`name`	TEXT,
-	PRIMARY KEY(`person_id`)
+	PRIMARY KEY(`guest_id`)
 );
 CREATE TABLE IF NOT EXISTS `events` (
 	`event_id`	INTEGER,
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS `events` (
 	`episode`	INTEGER,
 	`timestamp`	INTEGER,
 	`description`	TEXT,
-	PRIMARY KEY(`event_id`),
-	FOREIGN KEY(`show`,`episode`) REFERENCES `episodes`(`show`,`episode`)
+	FOREIGN KEY(`show`,`episode`) REFERENCES `episodes`(`show`,`episode`),
+	PRIMARY KEY(`event_id`)
 );
 CREATE TABLE IF NOT EXISTS `episodes` (
 	`show`	INTEGER,
@@ -24,14 +24,14 @@ CREATE TABLE IF NOT EXISTS `episodes` (
 	`airdate`	TEXT,
 	`runtime`	INTEGER,
 	`yt_link`	TEXT,
-	PRIMARY KEY(`show`,`episode`),
-	FOREIGN KEY(`show`) REFERENCES `shows`(`show_id`)
+	FOREIGN KEY(`show`) REFERENCES `shows`(`show_id`),
+	PRIMARY KEY(`show`,`episode`)
 );
-CREATE TABLE IF NOT EXISTS `appearance` (
+CREATE TABLE IF NOT EXISTS `appearances` (
 	`show`	INTEGER,
 	`episode`	INTEGER,
-	`person_id`	INTEGER,
-	FOREIGN KEY(`person_id`) REFERENCES `people`(`person_id`),
-	FOREIGN KEY(`show`,`episode`) REFERENCES `episodes`(`show`,`episode`)
+	`guest_id`	INTEGER,
+	FOREIGN KEY(`show`,`episode`) REFERENCES `episodes`(`show`,`episode`),
+	FOREIGN KEY(`guest_id`) REFERENCES `guests`(`guest_id`)
 );
 COMMIT;

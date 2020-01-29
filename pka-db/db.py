@@ -37,10 +37,10 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> Tuple[int
         raise Exception()
     
     return cur.execute('''
-    select person_id, name from people
-    where person_id in (
-        select person_id from appearance
-        where appearance.show = ? and appearance.episode = ?
+    select guest_id, name from guests
+    where guest_id in (
+        select guest_id from appearances
+        where appearances.show = ? and appearances.episode = ?
     );
     ''', (show_id, ep_num)).fetchall()
 
@@ -48,21 +48,21 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> Tuple[int
 def all_guest_appearances_by_id(guest_id: int) -> List[Tuple[int, int]]:
     conn = sqlite3.connect('main.db')
 
-    return conn.execute('''select show, episode from appearance
-    where appearance.person_id in (
-	    select person_id from people
-	    where people.person_id = ?
+    return conn.execute('''select show, episode from appearances
+    where appearances.guest_id in (
+	    select guest_id from guests
+	    where guests.guest_id = ?
     )''', (guest_id,))
 
-def all_guest_appearance_by_name(cur: sqlite3.Cursor, guest_name: str) -> List[Tuple[int, int]]:
+def all_guest_appearances_by_name(cur: sqlite3.Cursor, guest_name: str) -> List[Tuple[int, int]]:
     guest_name = f'%{guest_name}%'
 
-    return cur.execute('''select show, episode from appearance
-    where appearance.person_id in (
-	    select person_id from people
-	    where people.name like ?
+    return cur.execute('''select show, episode from appearances
+    where appearances.guest_id in (
+	    select guest_id from guests
+	    where guests.name like ?
     )
     order by episode asc''', (guest_name,)).fetchall()
 
 #print(2 + 2)
-#print(all_guest_appearance_by_name(sqlite3.connect('main.db').cursor(), 'Awz'))
+#print(all_guest_appearances_by_name(sqlite3.connect('main.db').cursor(), 'Awz'))

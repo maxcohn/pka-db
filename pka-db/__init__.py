@@ -34,7 +34,7 @@ def get_pka_epsiode(episode):
 @app.route('/guest/name/<guest_name>')
 def get_guest_by_name(guest_name):
     cur = get_db().cursor()
-    guest_list = db.all_guest_appearance_by_name(cur, guest_name)
+    guest_list = db.all_guest_appearances_by_name(cur, guest_name)
     cur.close()
     return '\n'.join(map(lambda x: f'<li>{x[1]}</li>', guest_list))
 
