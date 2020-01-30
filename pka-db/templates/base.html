@@ -1,0 +1,34 @@
+<html>
+<head>
+  <title>{% block title %}{% endblock %} - PKA-DB</title>
+
+  <!--TODO change this href-->
+  <link rel='stylesheet' type='text/css' href='static/style.css'>
+  <script src='/static/script.js'></script>
+</head>
+<body>
+
+  <div class='header'>
+    <h1>PKA DB</h1>
+  </div>
+
+
+  <div class='search'>
+    <input type='text' id='search-box' />
+
+    <select id='search-type'>
+      <option value='episode-pka'>Episode (PKA)</option>
+      <option value='episode-pkn'>Episode (PKN)</option>
+      <option value='guest' >Guest</option>
+      <option value='event' >Event</option>
+    </select>
+
+    <button id='search-button'>Go</button>
+  </div>
+
+  {% block content %}
+
+  {% endblock %}
+
+</body>
+</html>

@@ -15,11 +15,13 @@ def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
     elif show == 'pkn':
         show_id = 2
     else:
-        #TODO specify exception
-        raise Exception()
+        #TODO throw exception?
+        return
 
-
-    return cur.execute('''select timestamp, description from events where show = ? and episode = ?;''', (show_id, ep_num)).fetchall()
+    return cur.execute('''
+    select timestamp, description from events
+    where show = ? and episode = ?;
+    ''', (show_id, ep_num)).fetchall()
 
 def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
     show = show.lower()
@@ -51,6 +53,8 @@ def all_guest_appearances_by_id(guest_id: int) -> List[Tuple[int, int]]:
 	    where guests.guest_id = ?
     )''', (guest_id,))
 
+
+#TODO change this toa  search
 def all_guest_appearances_by_name(cur: sqlite3.Cursor, guest_name: str) -> List[Tuple[int, int]]:
     '''Get each apperance (show_id, episode_num) of all guests that match `guest_name`
 

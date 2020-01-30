@@ -22,8 +22,17 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
+@app.route('/')
+def home():
+    return render_template('base.html')
+
 @app.route('/pka/<episode>')
 def get_pka_epsiode(episode):
+    '''Page consisting of list of guests present on the episode and a list of
+    events from that episode.
+
+    :param episode: Episode number
+    '''
     cur = get_db()
     guest_list = db.all_episode_guests(cur, 'pka', episode)
     cur.close()
@@ -31,6 +40,15 @@ def get_pka_epsiode(episode):
     return '\n'.join(map(lambda x: f'<li>{x[1]}</li>', guest_list))
 
 
+@app.route('/guests/id/<guest_id>')
+def guest(guest_id: int):
+
+    cur = get_db().cursur()
+    
+    #TODO finish this page
+    render_template('guests.html')
+
+#TODO change this to a search
 @app.route('/guest/name/<guest_name>')
 def get_guest_by_name(guest_name):
     cur = get_db().cursor()
