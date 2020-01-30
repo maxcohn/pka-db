@@ -5,12 +5,8 @@ from typing import Tuple, List
 
 #TODO figure out how to add 136.5
 
-def _get_conn() -> sqlite3.Connection:
-    return sqlite3.connect('main.db')
 
-def all_episode_events(show: str, ep_num: int):
-
-    conn = sqlite3.connect('main.db')
+def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
 
     show = show.lower()
     show_id = 0
@@ -23,9 +19,9 @@ def all_episode_events(show: str, ep_num: int):
         raise Exception()
 
 
-    return conn.execute('''select timestamp, description from events where show = ? and episode = ?;''', (show_id, ep_num))
+    return cur.execute('''select timestamp, description from events where show = ? and episode = ?;''', (show_id, ep_num)).fetchall()
 
-def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> Tuple[int, str]:
+def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
     show = show.lower()
     show_id = 0
     if show == 'pka':
@@ -45,6 +41,7 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> Tuple[int
     ''', (show_id, ep_num)).fetchall()
 
 
+#TODO use cur
 def all_guest_appearances_by_id(guest_id: int) -> List[Tuple[int, int]]:
     conn = sqlite3.connect('main.db')
 
@@ -55,6 +52,12 @@ def all_guest_appearances_by_id(guest_id: int) -> List[Tuple[int, int]]:
     )''', (guest_id,))
 
 def all_guest_appearances_by_name(cur: sqlite3.Cursor, guest_name: str) -> List[Tuple[int, int]]:
+    '''Get each apperance (show_id, episode_num) of all guests that match `guest_name`
+
+    :param cur: Database cursor
+
+    :param guest_name: Guest name to search in the database
+    '''
     guest_name = f'%{guest_name}%'
 
     return cur.execute('''select show, episode from appearances
