@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{show_name}} {{episode}}{% endblock %}
+
+{% block content %}
+
+  <div class='guest-list'>
+    <ul>
+      {% for guest in guest_list %}
+        <li><a href='/guest/id/{{guest["id"]}}'>{{guest['name']}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+{% endblock %}

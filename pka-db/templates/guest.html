@@ -1,3 +1,22 @@
 {% extends 'base.html' %}
 
 {% block title %}{{guest_name}}{% endblock %}
+
+{% block content %}
+
+  <h2>{{guest_name}}</h2>
+  <div class="guest-stats">
+    <p>Total appearances: {{appearance_list|length}}</p>
+    <p>Total runtime of all the shows they appeared on: {{runtime}}</p>
+
+  </div>
+
+
+  <div class="appearance-list">
+    <ul>
+      {% for appearance in appearance_list %}
+        <li><a href="/{{appearance['show_name']|lower}}/{{appearance['episode']}}">{{appearance['show_name']}} {{appearance['episode']}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
