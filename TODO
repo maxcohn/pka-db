@@ -1,16 +1,30 @@
-add recent pkas
+Events page
+    Embed at timestamp
 
-add events table
+Maybe add quotes page?
+    with timestamp and Embed
+    basically an event at that point
 
-create db api
+Guest and event search
+
+Add PKN to DB
+
+
+
+Clean styling
+
+
+
 
 add way for people to contribute
-
-schedule backups
-
 
 create readme
 
 create docker
+
+
+schedule backups
+
+
 
 deploy

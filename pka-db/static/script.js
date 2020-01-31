@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             //TODO populate this for real
             case 'episode-pka':
                 
-                window.open('/pka/350', '_self');
+                window.open(`/pka/${document.querySelector('#search-box').value}`, '_self');
                 break;
             case 'episode-pkn':
                 //window.open()

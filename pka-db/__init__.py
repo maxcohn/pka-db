@@ -23,9 +23,11 @@ def get_pka_epsiode(episode):
     '''
     cur = get_db().cursor()
 
+    # get the list of quests on this episode
     guest_list = db.all_episode_guests(cur, 'pka', episode)
-
     guest_list = [{'id': x[0], 'name': x[1]} for x in guest_list]
+
+    yt_link = db.get_yt_link(cur, 'pka', episode)
   
     
     
@@ -35,7 +37,8 @@ def get_pka_epsiode(episode):
         'episode.html',
         show_name='PKA',
         episode=episode,
-        guest_list=guest_list
+        guest_list=guest_list,
+        yt_link=yt_link
     )
 
 

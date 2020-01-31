@@ -15,13 +15,29 @@ def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
     elif show == 'pkn':
         show_id = 2
     else:
-        #TODO throw exception?
-        return
+        raise Exception(f'Invalid show identifier: "{show}"')
 
     return cur.execute('''
     select timestamp, description from events
     where show = ? and episode = ?
     ''', (show_id, ep_num)).fetchall()
+
+def get_yt_link(cur: sqlite3.Cursor, show: str, ep_num: int) -> str:
+
+    #TODO abstract this
+    show = show.lower()
+    show_id = 0
+    if show == 'pka':
+        show_id = 1
+    elif show == 'pkn':
+        show_id = 2
+    else:
+        raise Exception(f'Invalid show identifier: "{show}"')
+
+    return cur.execute('''
+    select yt_link from episodes
+    where show = ? and episode = ?
+    ''', (show_id, ep_num)).fetchone()[0]
 
 def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
     '''Gets all guests that were on a given episode
@@ -39,8 +55,7 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
     elif show == 'pkn':
         show_id = 2
     else:
-        #TODO specify exception
-        raise Exception()
+        raise Exception(f'Invalid show identifier: "{show}"')
     
     return cur.execute('''
     select guest_id, name from guests
