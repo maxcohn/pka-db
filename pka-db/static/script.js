@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open(`/pka/${document.querySelector('#search-box').value}`, '_self');
                 break;
             case 'episode-pkn':
-                //window.open()
+                window.open(`/pkn/${document.querySelector('#search-box').value}`, '_self');
                 break;
             case 'guest':
 

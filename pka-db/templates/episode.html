@@ -6,7 +6,9 @@
 
 
   <h2>{{show_name}} {{episode}}</h2>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/{{yt_link}}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  {% if yt_link is not none %}
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/{{yt_link}}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  {% endif %}
   <div class='guest-list'>
     <ul>
       {% for guest in guest_list %}

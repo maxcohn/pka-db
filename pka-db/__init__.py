@@ -14,28 +14,31 @@ DATABASE_PATH = os.path.join(BASE_DIR, "main.db")
 def home():
     return render_template('base.html')
 
-@app.route('/pka/<episode>', methods=['GET'])
-def get_pka_epsiode(episode):
+@app.route('/<show>/<int:episode>', methods=['GET'])
+def get_pka_epsiode(show: str, episode):
     '''Page consisting of list of guests present on the episode and a list of
     events from that episode.
 
     :param episode: Episode number
     '''
+    show = show.lower()
+    if show not in ('pka', 'pkn'):
+        return 'BAD' #TODO change this
+
     cur = get_db().cursor()
 
     # get the list of quests on this episode
-    guest_list = db.all_episode_guests(cur, 'pka', episode)
+    guest_list = db.all_episode_guests(cur, show, episode)
     guest_list = [{'id': x[0], 'name': x[1]} for x in guest_list]
 
-    yt_link = db.get_yt_link(cur, 'pka', episode)
-  
-    
+    # get the youtube link if applicable
+    yt_link = db.get_yt_link(cur, show, episode)
     
     cur.close()
 
     return render_template(
         'episode.html',
-        show_name='PKA',
+        show_name=show.upper(),
         episode=episode,
         guest_list=guest_list,
         yt_link=yt_link
