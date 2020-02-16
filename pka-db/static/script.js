@@ -7,17 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // on search button click
     document.querySelector('#search-button').onclick = () => {
-        switch (document.querySelector('#search-type').value) {
+        let searchType = document.querySelector('#search-type').value;
+        let searchText = document.querySelector('#search-box').value;
+
+        if (searchText.trim() === '')
+            return;
+        switch (searchType) {
             //TODO populate this for real
             case 'episode-pka':
                 
-                window.open(`/pka/${document.querySelector('#search-box').value}`, '_self');
+                window.open(`/pka/${searchText}`, '_self');
                 break;
             case 'episode-pkn':
-                window.open(`/pkn/${document.querySelector('#search-box').value}`, '_self');
+                window.open(`/pkn/${searchText}`, '_self');
                 break;
             case 'guest':
-
+                window.open(`/guest/search/${searchText}`, '_self');
                 break;
             case 'event':
                 break;
@@ -25,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             default:
                 
         }
-        alert()
     }
 });
 

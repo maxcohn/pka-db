@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Search results for "{{search_str}}"{% endblock %}
+
+{% block content %}
+
+  {% if guest_list|length == 0 %}
+    No results for "{{search_str}}"
+  {% else %}
+  <h2>Search results for "{{search_str}}"</h2>
+
+  <div class='guest-list'>
+    <ul>
+      {% for guest in guest_list %}
+        <li><a href='/guest/id/{{guest["id"]}}'>{{guest['name']}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+{% endblock %}

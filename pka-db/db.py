@@ -90,6 +90,13 @@ def guest_name_by_id(cur: sqlite3.Cursor, guest_id: int) -> str:
     ''', (guest_id,)).fetchone()[0]
 
 def total_guest_runtime(cur: sqlite3.Cursor, guest_id: int) -> int:
+    '''Gets the total runtime (in seconds) for the given guest id
+
+    :param cur: DB cursor
+
+    :param guest_id: Id of the guest to check runtime for
+
+    '''
 
     pka_runtime = cur.execute('''
     select sum(runtime) from episodes
@@ -123,6 +130,24 @@ def total_guest_runtime(cur: sqlite3.Cursor, guest_id: int) -> int:
 
     return pka_runtime + pkn_runtime
 
+def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[str]:
+    '''Querys the database for guests who have a name contianing the given string
+
+    :param cur: DB cursor
+
+    :param search_str: String representing the guest's name to be searched
+    '''
+    wildcard_name = f'%{search_str}%'
+    all_results = cur.execute('''
+    select guest_id, name from guests
+    where name like ?
+    ''', (wildcard_name,)).fetchall()
+
+    all_results = [{'id': res[0], 'name': res[1]} for res in all_results]
+
+    return all_results
+
+    
 
 
 """

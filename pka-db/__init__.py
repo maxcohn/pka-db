@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, redirect, url_for
 from . import db
 import sqlite3
 import os
@@ -43,6 +43,21 @@ def get_pka_epsiode(show: str, episode):
         guest_list=guest_list,
         yt_link=yt_link
     )
+
+@app.route('/guest/search/<search_str>', methods=['GET'])
+def guest_search(search_str: str):
+    cur = get_db().cursor()
+    all_results = db.guest_name_search(cur, search_str)
+    cur.close()
+
+    if len(all_results) == 1:
+        #todo, redirect to /guest/id/<id>
+        return redirect(url_for('get_guest', guest_id=all_results[0]['id']))
+        pass
+    
+    #TODO return search result page
+    return render_template('guest-search.html', search_str=search_str, guest_list=all_results)
+
 
 
 @app.route('/guest/id/<guest_id>', methods=['GET'])

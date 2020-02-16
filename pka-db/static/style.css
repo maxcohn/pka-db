@@ -2,10 +2,14 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.header {
+header {
     text-align: center;
     
 }
 .search {
     text-align: center;
+}
+
+.main-content {
+    
 }

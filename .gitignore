@@ -3,3 +3,5 @@
 *.csv
 __pycache__/
 .vscode/
+
+*.ini
