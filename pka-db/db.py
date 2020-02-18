@@ -1,21 +1,22 @@
-"""DB interaction"""
-
+'''DB interaction'''
 import sqlite3
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 #TODO figure out how to add 136.5
 
 
 def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
+    '''Get all events for a given episode
 
-    show = show.lower()
-    show_id = 0
-    if show == 'pka':
-        show_id = 1
-    elif show == 'pkn':
-        show_id = 2
-    else:
-        raise Exception(f'Invalid show identifier: "{show}"')
+    Args:
+        cur (Cursor): DB cursor.
+        show (str): Show name.
+        ep_num (int): Episode number.
+
+    Returns:
+        List[Tuple[int,str]]: List of events (tuples) in the format: (timestamp, event_description).
+    '''
+    show_id = get_show_id(show)
 
     return cur.execute('''
     select timestamp, description from events
@@ -23,16 +24,17 @@ def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
     ''', (show_id, ep_num)).fetchall()
 
 def get_yt_link(cur: sqlite3.Cursor, show: str, ep_num: int) -> str:
+    '''Get YouTube link for a given episode
 
-    #TODO abstract this
-    show = show.lower()
-    show_id = 0
-    if show == 'pka':
-        show_id = 1
-    elif show == 'pkn':
-        show_id = 2
-    else:
-        raise Exception(f'Invalid show identifier: "{show}"')
+    Args:
+        cur (Cursor): DB cursor.
+        show (str): Show name.
+        ep_num (int): Episode number.
+
+    Returns:
+        str: YouTube link following the `v` query param (e.g.`www.youtube.com/watch?v=`).
+    '''
+    show_id = get_show_id(show)
 
     return cur.execute('''
     select yt_link from episodes
@@ -42,20 +44,15 @@ def get_yt_link(cur: sqlite3.Cursor, show: str, ep_num: int) -> str:
 def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
     '''Gets all guests that were on a given episode
 
-    :param cur: DB cursor
+    Args:
+        cur (Cursor): DB cursor.
+        show (str): Show name.
+        ep_num (int): Episode number.
 
-    :param show: Name of the show ('pka' or 'pkn')
-
-    :param ep_num: Episode number
+    Returns:
+        List[Tuple[int, str]]: List of appearances (tuples) in the format: (show_id, episode_num)
     '''
-    show = show.lower()
-    show_id = 0
-    if show == 'pka':
-        show_id = 1
-    elif show == 'pkn':
-        show_id = 2
-    else:
-        raise Exception(f'Invalid show identifier: "{show}"')
+    show_id = get_show_id(show)
     
     return cur.execute('''
     select guest_id, name from guests
@@ -69,9 +66,12 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
 def all_guest_appearances_by_id(cur: sqlite3.Cursor, guest_id: int) -> List[Tuple[int, int]]:
     '''Finds all apperances of a given guest id
 
-    :param cur: DB cursor
+    Args:
+        cur (Cursor): DB cursor
+        guest_id (int): Guest id in the DB
 
-    :param guest_id: Guest id in the DB
+    Returns:
+        List[Tuple[int, int]]: List of appearances (tuples) in the format: (show_id, episode_num)
     '''
     return cur.execute('''
     select show, episode from appearances
@@ -83,7 +83,15 @@ def all_guest_appearances_by_id(cur: sqlite3.Cursor, guest_id: int) -> List[Tupl
     ''', (guest_id,))
 
 def guest_name_by_id(cur: sqlite3.Cursor, guest_id: int) -> str:
+    '''Get the name of a guest based on their id
 
+    Args:
+        cur (Cursor): DB cursor
+        guest_id (int): Id of the guest
+    
+    Returns:
+        str: Guest name
+    '''
     return cur.execute('''
     select name from guests
     where guest_id = ?
@@ -92,12 +100,13 @@ def guest_name_by_id(cur: sqlite3.Cursor, guest_id: int) -> str:
 def total_guest_runtime(cur: sqlite3.Cursor, guest_id: int) -> int:
     '''Gets the total runtime (in seconds) for the given guest id
 
-    :param cur: DB cursor
+    Args:
+        cur (Cursor): DB cursor
+        guest_id (int): Id of the guest to check runtime for
 
-    :param guest_id: Id of the guest to check runtime for
-
+    Returns:
+        int: Total runtime in seconds
     '''
-
     pka_runtime = cur.execute('''
     select sum(runtime) from episodes
     where episode in (
@@ -106,8 +115,6 @@ def total_guest_runtime(cur: sqlite3.Cursor, guest_id: int) -> int:
     )
     and show = 1
     ''', (guest_id,)).fetchone()[0]
-
-    print(f'pka runtime: {pka_runtime}', flush=True)
 
     pkn_runtime = cur.execute('''
     select sum(runtime) from episodes
@@ -124,18 +131,21 @@ def total_guest_runtime(cur: sqlite3.Cursor, guest_id: int) -> int:
     if pkn_runtime is None:
         pkn_runtime = 0
 
-
-
-    print(f'pkn runtime: {pkn_runtime}', flush=True)
-
     return pka_runtime + pkn_runtime
 
-def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[str]:
+def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
     '''Querys the database for guests who have a name contianing the given string
 
-    :param cur: DB cursor
+    Args:
+        cur (Cursor): DB cursor
+        search_str (str): Search query
 
-    :param search_str: String representing the guest's name to be searched
+    Returns:
+        List of dicts with the format:
+        {
+            id: guest_id
+            name: guest_name
+        }
     '''
     wildcard_name = f'%{search_str}%'
     all_results = cur.execute('''
@@ -143,31 +153,21 @@ def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[str]:
     where name like ?
     ''', (wildcard_name,)).fetchall()
 
-    all_results = [{'id': res[0], 'name': res[1]} for res in all_results]
+    return [{'id': res[0], 'name': res[1]} for res in all_results]
 
-    return all_results
+def get_show_id(show_name: str) -> int:
+    '''Get show id from a string representation
 
-    
+    Args:
+        show_name (str): String representation of show name (e.g. 'pka' or 'pkn')
 
-
-"""
-#TODO change this toa  search
-def all_guest_appearances_by_name(cur: sqlite3.Cursor, guest_name: str) -> List[Tuple[int, int]]:
-    '''Get each apperance (show_id, episode_num) of all guests that match `guest_name`
-
-    :param cur: Database cursor
-
-    :param guest_name: Guest name to search in the database
+    Returns:
+        int: Show id in the database
     '''
-    guest_name = f'%{guest_name}%'
-
-    return cur.execute('''
-    select show, episode from appearances
-    where appearances.guest_id in (
-	    select guest_id from guests
-	    where guests.name like ?
-    )
-    order by episode asc''', (guest_name,)).fetchall()
-"""
-#print(2 + 2)
-#print(all_guest_appearances_by_name(sqlite3.connect('main.db').cursor(), 'Awz'))
+    show_name = show_name.strip().lower()
+    if show_name == 'pka':
+        return 1
+    elif show_name == 'pkn':
+        return 2
+    else:
+        raise Exception(f'Invalid show identifier: "{show_name}"')
