@@ -4,14 +4,25 @@
 
 {% block content %}
 
-  <h2>{{guest_name}}</h2>
+  <h2 class='title'>{{guest_name}}</h2>
   <div class="guest-stats">
-    <p>Total appearances: {{appearance_list|length}}</p>
-    <p>Total runtime of all the shows they appeared on: {{runtime}}</p>
+    <p class='subtitle'>Total appearances: {{appearance_list|length}}</p>
+    <p>Total runtime of all the shows they appeared on:</p>
+    <p>{{runtime}}</p>
 
   </div>
 
+  <table class='table'>
+    <tbody>
+      {% for appearance in appearance_list %}
+      <tr>
+        <td><a href="/{{appearance['show_name']|lower}}/{{appearance['episode']}}">{{appearance['show_name']}} {{appearance['episode']}}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
+  <!--
   <div class="appearance-list">
     <ul>
       {% for appearance in appearance_list %}
@@ -19,4 +30,5 @@
       {% endfor %}
     </ul>
   </div>
+  -->
 {% endblock %}

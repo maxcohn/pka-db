@@ -5,8 +5,10 @@ import os
 import datetime
 app = Flask(__name__)
 
+
+# get current path and then up one to the database path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_PATH = os.path.join(BASE_DIR, "main.db")
+DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
 #DATABASE_PATH = 'main.db'
 
 

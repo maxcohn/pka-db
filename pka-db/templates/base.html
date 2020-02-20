@@ -3,31 +3,42 @@
   <title>{% block title %}{% endblock %} - PKA-DB</title>
 
   <!--TODO change this href-->
-  <link rel='stylesheet' type='text/css' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <!--<link rel='stylesheet' type='text/css' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' />
+  -->
   <link rel='stylesheet' type='text/css' href='{{ url_for("static", filename="style.css") }}' />
   <script src='{{ url_for("static", filename="script.js") }}'></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
   <header>
-    <h1>PKA DB</h1>
+    <h1 class='title is-1'>PKA DB</h1>
   </header>
 
-
-  <div class='search'>
-    <input type='text' id='search-box' />
-
-    <select id='search-type'>
-      <option value='episode-pka'>Episode (PKA)</option>
-      <option value='episode-pkn'>Episode (PKN)</option>
-      <option value='guest' >Guest</option>
-      <option value='event' >Event</option>
-    </select>
-
-    <button id='search-button'>Go</button>
+  <!-- Search -->
+  <div class="search field has-addons has-addons-centered">
+    <p class="control">
+      <span class="select">
+        <select id='search-type'>
+          <option value='episode-pka'>Episode (PKA)</option>
+          <option value='episode-pkn'>Episode (PKN)</option>
+          <option value='guest' >Guest</option>
+          <option value='event' >Event</option>
+        </select>
+      </span>
+    </p>
+    <p class="control">
+      <input class="input" type="text" id='search-box'>
+    </p>
+    <p class="control">
+      <a class="button" id='search-button'>
+        Search
+      </a>
+    </p>
   </div>
 
-  <div class='main-content text-center'>
+  <div class='main-content'>
     {% block content %}
 
     {% endblock %}
