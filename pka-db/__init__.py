@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, g, redirect, url_for
 from . import db
+from . import utils
 import sqlite3
 import os
 import datetime
@@ -58,10 +59,7 @@ def get_guest(guest_id: int):
     # get total runtime and convert to a nicer format
     total_runtime = db.total_guest_runtime(cur, guest_id)
 
-    seconds = total_runtime % 60
-    total_runtime = total_runtime // 60
-    minutes = total_runtime % 60
-    hours = total_runtime // 60
+    hours, minutes, seconds = utils.sec_to_parts(total_runtime)
 
     runtime_str = f'{hours} hours, {minutes} minutes, and {seconds} seconds'
 
@@ -77,6 +75,12 @@ def get_guest(guest_id: int):
         guest_name=guest_name    
     )
 
+
+@app.route('/event/id/<event_id>', methods=['GET'])
+def get_event(event_id: int):
+    #TODO
+    return 0
+
 @app.route('/guest/search/<search_str>', methods=['GET'])
 def guest_search(search_str: str):
     cur = get_db().cursor()
@@ -87,6 +91,28 @@ def guest_search(search_str: str):
         return redirect(url_for('get_guest', guest_id=all_results[0]['id']))
     
     return render_template('guest-search.html', search_str=search_str, guest_list=all_results)
+
+@app.route('/event/search/<search_str>', methods=['GET'])
+def event_search(search_str: str):
+    cur = get_db().cursor()
+    all_results = db.event_search(cur, search_str)
+    cur.close()
+
+    #if len(all_results) == 1:
+    #    return redirect(url_for('get_event', event_id=all_results[0]['id']))
+
+    return render_template('event-search.html', search_str=search_str, event_list=all_results)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -105,4 +131,5 @@ def close_connection(exception):
         db.close()
 
 if __name__ == '__main__':
+
     app.run()

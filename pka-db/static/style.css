@@ -21,9 +21,9 @@ header {
     width: 100%;
     height: 0;
     position: relative;
+
     /* percentage of container width so that we can get a 16x9 ratio */
     padding-top: 56.25%;
-
 }
 
 .yt-embed > iframe {
@@ -33,4 +33,9 @@ header {
     top: 0;
     left: 0;
     border: 0;
-  }
+}
+
+.event-search-table {
+    margin-left: auto;
+    margin-right: auto;
+}

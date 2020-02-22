@@ -1,6 +1,7 @@
 '''DB interaction'''
 import sqlite3
 from typing import Tuple, List, Dict
+from . import utils
 
 #TODO figure out how to add 136.5
 
@@ -16,7 +17,7 @@ def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
     Returns:
         List[Tuple[int,str]]: List of events (tuples) in the format: (timestamp, event_description).
     '''
-    show_id = get_show_id(show)
+    show_id = utils.get_show_id(show)
 
     return cur.execute('''
     select timestamp, description from events
@@ -34,7 +35,7 @@ def get_yt_link(cur: sqlite3.Cursor, show: str, ep_num: int) -> str:
     Returns:
         str: YouTube link following the `v` query param (e.g.`www.youtube.com/watch?v=`).
     '''
-    show_id = get_show_id(show)
+    show_id = utils.get_show_id(show)
 
     return cur.execute('''
     select yt_link from episodes
@@ -52,7 +53,7 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
     Returns:
         List[Tuple[int, str]]: List of appearances (tuples) in the format: (show_id, episode_num)
     '''
-    show_id = get_show_id(show)
+    show_id = utils.get_show_id(show)
     
     return cur.execute('''
     select guest_id, name from guests
@@ -155,19 +156,33 @@ def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
 
     return [{'id': res[0], 'name': res[1]} for res in all_results]
 
-def get_show_id(show_name: str) -> int:
-    '''Get show id from a string representation
+def event_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
+    '''Querys the database for events that match given string
 
     Args:
-        show_name (str): String representation of show name (e.g. 'pka' or 'pkn')
+        cur (Cursor): DB cursor
+        search_str (str): Search query
 
     Returns:
-        int: Show id in the database
+        List of dicts with the format:
+        {
+            id: event_id,
+            show: show,
+            episode: episode,
+            timestamp: timestamp,
+            description: description,
+        }
     '''
-    show_name = show_name.strip().lower()
-    if show_name == 'pka':
-        return 1
-    elif show_name == 'pkn':
-        return 2
-    else:
-        raise Exception(f'Invalid show identifier: "{show_name}"')
+    wildcard_name = f'%{search_str}%'
+    all_results = cur.execute('''
+    select event_id, show, episode, timestamp, description from events
+    where description like ?
+    ''', (wildcard_name,)).fetchall()
+
+    return [{
+        'id': res[0],
+        'show': 'PKA' if res[1] == 1 else 'PKN',
+        'episode': res[2],
+        'timestamp': utils.sec_to_timestr(res[3]),
+        'description': res[4],
+    } for res in all_results]

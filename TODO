@@ -10,6 +10,13 @@ Event search
 Guest bio?
     store in column in guest table
 
+Guest images
+    How to host? 
+        S3?
+
+convert abuse of dicts to proper DB models
+
+retain search type after each new page
 
 add way for people to contribute
 
