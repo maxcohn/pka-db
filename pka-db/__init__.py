@@ -3,49 +3,79 @@ from . import db
 from . import utils
 import sqlite3
 import os
-import datetime
 app = Flask(__name__)
 
-
+#TODO have full db path laoded from .env
 # get current path and then up one to the database path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
 
+#===============================================================================
+# Routes
+#===============================================================================
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def home():
     return render_template('base.html')
 
-@app.route('/<show>/<int:episode>', methods=['GET'])
-def get_pka_epsiode(show: str, episode):
-    '''Page consisting of list of guests present on the episode and a list of
-    events from that episode.
+@app.route('/about', methods=['GET'])
+def about():
+    #TODO add doc comment
+    return render_template('about.html')
 
-    Args:
-        episode (int): Episode number
-    '''
-    show = show.lower()
-    if show not in ('pka', 'pkn'):
-        return 'BAD' #TODO change this
+@app.route('/new-event', methods=['GET', 'POST'])
+def new_event():
+    #TODO add doc comment
+    if request.method == 'GET':
+        return render_template('new-event.html')
 
-    cur = get_db().cursor()
-
-    # get the list of quests on this episode
-    guest_list = db.all_episode_guests(cur, show, episode)
-    guest_list = [{'id': x[0], 'name': x[1]} for x in guest_list]
-
-    # get the youtube link if applicable
-    yt_link = db.get_yt_link(cur, show, episode)
     
-    cur.close()
+    show = request.json['show']
+    episode = request.json['episode']
+    timestamp = request.json['timestamp']
+    description = request.json['description']
 
-    return render_template(
-        'episode.html',
-        show_name=show.upper(),
-        episode=episode,
-        guest_list=guest_list,
-        yt_link=yt_link
-    )
+    #TODO abstract this
+    cur = get_db().cursor()
+    cur.execute('''
+    insert into pending_events
+    (show, episode, timestamp, description)
+    values (?,?,?,?)
+    ''', (utils.get_show_id(show), episode, timestamp, description))
+    cur.close()
+    get_db().commit()
+    return ('', 201)
+
+@app.route('/admin', methods=['GET','POST'])
+def admin():
+    #TODO have this loaded from .env
+    #TODO clean this entire thing
+    username = request.args.get('username')
+    password = request.args.get('password')
+
+    if username != 'test_user' or password != 'test_pass':
+        return ('', 401)
+    
+    if request.method == 'GET':
+        cur = get_db().cursor()
+        pending_events = db.all_pending_events(cur)
+        cur.close()
+        return render_template('admin.html', pending_events=pending_events)
+
+    
+    event_id = request.json['id']
+    cur = get_db().cursor()
+    cur.execute('''
+    insert into events
+    (show, episode, timestamp, description)
+    select show, episode, timestamp, description from pending_events
+    where event_id = ?
+    ''', (event_id,))
+    cur.execute('delete from pending_events where event_id = ?', (event_id,))
+    get_db().commit()
+    cur.close()
+    
+    return ('RAD', 401)
 
 @app.route('/guest/id/<guest_id>', methods=['GET'])
 def get_guest(guest_id: int):
@@ -73,7 +103,6 @@ def get_guest(guest_id: int):
         runtime=runtime_str,
         guest_name=guest_name    
     )
-
 
 @app.route('/event/id/<event_id>', methods=['GET'])
 def get_event(event_id: int):
@@ -106,6 +135,36 @@ def event_search(search_str: str):
 
     return render_template('event-search.html', search_str=search_str, event_list=all_results)
 
+@app.route('/<show>/<int:episode>', methods=['GET'])
+def get_pka_epsiode(show: str, episode):
+    '''Page consisting of list of guests present on the episode and a list of
+    events from that episode.
+
+    Args:
+        episode (int): Episode number
+    '''
+    show = show.lower()
+    if show not in ('pka', 'pkn'):
+        return 'BAD' #TODO change this
+
+    cur = get_db().cursor()
+
+    # get the list of quests on this episode
+    guest_list = db.all_episode_guests(cur, show, episode)
+    guest_list = [{'id': x[0], 'name': x[1]} for x in guest_list]
+
+    # get the youtube link if applicable
+    yt_link = db.get_yt_link(cur, show, episode)
+    
+    cur.close()
+
+    return render_template(
+        'episode.html',
+        show_name=show.upper(),
+        episode=episode,
+        guest_list=guest_list,
+        yt_link=yt_link
+    )
 
 #===============================================================================
 # Misc functions related to routes

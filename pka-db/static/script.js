@@ -45,5 +45,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 
         }
     }
+
+    //TODO maybe put this in its own script
+    document.querySelector('#submit-event').onclick = async () => {
+        let show = document.querySelector('#show-input').value;
+        let episode = document.querySelector('#episode-input').value;
+        let timestamp = document.querySelector('#timestamp-input').value.trim();
+        let description = document.querySelector('#description-input').value.trim();
+        
+        // check if timestamp input is a valid format
+        if(!timestamp.match(/^0\d:[0-5]\d:[0-5]\d$/)) {
+            alert('Please enter a valid timestamp (format: hh:mm:ss)');
+            return;
+        }
+        
+        // parse timestamp in hours, minutes, seconds
+        let [hours, minutes, seconds] = timestamp.split(':').map(t => parseInt(t, 10));
+        let tsSeconds = (hours * 60 * 60) + (minutes * 60) + seconds;
+
+        await fetch('/new-event', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                show,
+                episode,
+                timestamp: tsSeconds,
+                description,
+            }),
+        });
+
+        //window.open('/', '_self');
+    }
 });
 

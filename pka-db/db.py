@@ -219,3 +219,21 @@ def get_event_by_id(cur: sqlite3.Cursor, event_id: int) -> Dict:
         'timestamp': event[3],
         'description': event[4], 
     }
+
+#===============================================================================
+# Admin related
+#===============================================================================
+def all_pending_events(cur: sqlite3.Cursor) -> List[Dict]:
+    #TODO document later
+
+    all_events = cur.execute('''select event_id, show, episode, timestamp, description from pending_events''').fetchall()
+
+    #TODO clean this up, this is gross
+    return [{
+        'id': e[0],
+        'show': 'PKA' if e[1] == 1 else 'PKN',
+        'episode': e[2],
+        'timestamp': e[3],
+        'description': e[4],
+        'link': f'http://www.youtube.com/watch?v={get_yt_link(cur, "PKA" if e[1] == 1 else "PKN",e[2])}&t={e[3]}'
+    } for e in all_events]

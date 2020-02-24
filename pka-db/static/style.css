@@ -35,7 +35,12 @@ header {
     border: 0;
 }
 
+.guest-search-table,
 .event-search-table {
     margin-left: auto;
     margin-right: auto;
+}
+
+article {
+    text-align: left;
 }

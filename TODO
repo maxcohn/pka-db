@@ -1,3 +1,25 @@
+Document stuff that isn't documented after adding admin
+
+Clean code for admin
+add way for people to contribute
+
+
+add .env support
+
+insert latest 2 pka episodes and last 50ish pkn
+    figure out which ones kyle was in prison for
+
+convert abuse of dicts to proper DB models
+
+retain search type after each new page
+
+
+home page shows random events
+
+
+schedule backups
+
+
 Guest bio?
     store in column in guest table
 
@@ -5,18 +27,6 @@ Guest images
     How to host? 
         S3?
 
-convert abuse of dicts to proper DB models
-
-retain search type after each new page
-
-add way for people to contribute
-
-create readme
-
-create docker
-
-
-schedule backups
 
 
 figure out how to mitigate DDOS potential
@@ -28,6 +38,4 @@ deploy
 
 With some testing, the real bottleneck for concurrent requests is the CPU, not ram
 
-insert latest 2 pka episodes and last 50ish pkn
-    figure out which ones kyle was in prison for
-    
+

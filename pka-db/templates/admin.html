@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Portal{% endblock %}
+
+{% block content %}
+
+  <!--TODO move this into its own file-->
+  <script>
+    //TODO clean this entire process up
+    const approve = async (id) => {
+      await fetch(`/admin${window.location.search}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id
+        })
+      });
+
+
+    }
+  </script>
+  <table class='table event-search-table'>
+    <thead>
+      <tr>
+        <th>Episode</th>
+        <th>Event</th>
+        <th>Timestamp</th>
+        <th>Approve</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in pending_events %}       
+        <tr>
+          <td>
+            <a href="/{{event['show']|lower}}/{{event['episode']}}">
+              {{event['show']}} {{event['episode']}}
+            </a>
+          </td>
+          <td>
+            <a href="{{event['link']}}">
+              {{event['description']}}
+            </a>
+          </td>
+          <td>{{event['timestamp']}}</td>
+          <td>
+            <button class='button' onclick='approve({{event["id"]}})'>Approve</button>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

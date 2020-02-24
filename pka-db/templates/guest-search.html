@@ -9,12 +9,25 @@
   {% else %}
   <h2>Search results for "{{search_str}}"</h2>
 
-  <div class='guest-list'>
-    <ul>
-      {% for guest in guest_list %}
-        <li><a href='/guest/id/{{guest["id"]}}'>{{guest['name']}}</a></li>
+
+  <table class='table guest-search-table'>
+    <thead>
+      <tr>
+        <th>Guest</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for guest in guest_list %}       
+        <tr>
+          <td>
+            <a href="/guest/id/{{guest['id']}}">
+              {{guest['name']}}
+            </a>
+          </td>
+        </tr>
       {% endfor %}
-    </ul>
-  </div>
+    </tbody>
+  </table>
+
   {% endif %}
 {% endblock %}
