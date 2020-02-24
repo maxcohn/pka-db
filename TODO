@@ -1,12 +1,3 @@
-Events page
-    Embed at timestamp
-
-Maybe add quotes page?
-    with timestamp and Embed
-    basically an event at that point
-
-Event search
-
 Guest bio?
     store in column in guest table
 
@@ -28,5 +19,15 @@ create docker
 schedule backups
 
 
+figure out how to mitigate DDOS potential
+    https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/
+
 
 deploy
+
+
+With some testing, the real bottleneck for concurrent requests is the CPU, not ram
+
+insert latest 2 pka episodes and last 50ish pkn
+    figure out which ones kyle was in prison for
+    

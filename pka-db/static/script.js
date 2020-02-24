@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open(`/guest/search/${searchText}`, '_self');
                 break;
             case 'event':
+                window.open(`/event/search/${searchText}`, '_self');
                 break;
             
             default:

@@ -1,30 +1,17 @@
 {% extends 'base.html' %}
 
-{% block title %}{{event_description}}{% endblock %}
+{% block title %}{{event['description']}}{% endblock %}
 
 {% block content %}
 
-  <h2 class='title'>{{event_description}}</h2>
+  <h2 class='title'>{{event['description']}}</h2>
 
-  <table class='table'>
-    <thead>
-      <tr>
-        <th>Episode</th>
-        <th>Event</th>
-        <th>Timestamp</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for event in event_list %}
-        <a href="/event/{{event['id']}}">
-          <tr>
-            <td>{{event['show']}} {{event['episode']}}</td>
-            <td>{{event['description']}}</td>
-            <td>{{event['timestamp']}}</td>
-          </tr>
-        </a>
-      {% endfor %}
-    </tbody>
-  </table>
+
+  {% if yt_link is not none %}
+    <div class='yt-embed'>
+      <iframe src="https://www.youtube.com/embed/{{yt_link}}?start={{event['timestamp']}}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  {% endif %}
+ 
 
 {% endblock %}

@@ -6,6 +6,11 @@ from . import utils
 #TODO figure out how to add 136.5
 
 
+
+#===============================================================================
+# Episode related
+#===============================================================================
+
 def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
     '''Get all events for a given episode
 
@@ -42,6 +47,9 @@ def get_yt_link(cur: sqlite3.Cursor, show: str, ep_num: int) -> str:
     where show = ? and episode = ?
     ''', (show_id, ep_num)).fetchone()[0]
 
+#===============================================================================
+# Guest related
+#===============================================================================
 def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
     '''Gets all guests that were on a given episode
 
@@ -62,7 +70,6 @@ def all_episode_guests(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tupl
         where appearances.show = ? and appearances.episode = ?
     )
     ''', (show_id, ep_num)).fetchall()
-
 
 def all_guest_appearances_by_id(cur: sqlite3.Cursor, guest_id: int) -> List[Tuple[int, int]]:
     '''Finds all apperances of a given guest id
@@ -156,6 +163,9 @@ def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
 
     return [{'id': res[0], 'name': res[1]} for res in all_results]
 
+#===============================================================================
+# Event related
+#===============================================================================
 def event_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
     '''Querys the database for events that match given string
 
@@ -186,3 +196,26 @@ def event_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
         'timestamp': utils.sec_to_timestr(res[3]),
         'description': res[4],
     } for res in all_results]
+
+def get_event_by_id(cur: sqlite3.Cursor, event_id: int) -> Dict:
+    '''Get an event based on its id
+
+    Args:
+        cur (Cursor): Database cursor
+        event_id: Id of event
+
+    Returns:
+        dict: Dict representing an event
+    '''
+    event = cur.execute('''
+    select event_id, show, episode, timestamp, description from events
+    where event_id = ?
+    ''', (event_id,)).fetchone()
+
+    return {
+        'id': event[0],
+        'show': 'PKA' if event[1] == 1 else 'PKN',
+        'episode': event[2],
+        'timestamp': event[3],
+        'description': event[4], 
+    }

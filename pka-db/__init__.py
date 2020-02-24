@@ -10,7 +10,6 @@ app = Flask(__name__)
 # get current path and then up one to the database path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
-#DATABASE_PATH = 'main.db'
 
 
 @app.route('/')
@@ -78,8 +77,12 @@ def get_guest(guest_id: int):
 
 @app.route('/event/id/<event_id>', methods=['GET'])
 def get_event(event_id: int):
-    #TODO
-    return 0
+    cur = get_db().cursor()
+    event = db.get_event_by_id(cur, event_id)
+    yt_link = db.get_yt_link(cur, event['show'], event['episode'])
+    cur.close()
+
+    return render_template('event.html', event=event, yt_link=yt_link)
 
 @app.route('/guest/search/<search_str>', methods=['GET'])
 def guest_search(search_str: str):
@@ -104,17 +107,9 @@ def event_search(search_str: str):
     return render_template('event-search.html', search_str=search_str, event_list=all_results)
 
 
-
-
-
-
-
-
-
-
-
-
-
+#===============================================================================
+# Misc functions related to routes
+#===============================================================================
 
 def get_db():
     '''Get current open database connection'''
