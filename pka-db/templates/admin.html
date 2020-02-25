@@ -34,12 +34,12 @@
       {% for event in pending_events %}       
         <tr>
           <td>
-            <a href="/{{event['show']|lower}}/{{event['episode']}}">
+            <a href="/{{event['show']|lower}}/{{event['episode']}}" target='_blank'>
               {{event['show']}} {{event['episode']}}
             </a>
           </td>
           <td>
-            <a href="{{event['link']}}">
+            <a href="{{event['link']}}" target='_blank'>
               {{event['description']}}
             </a>
           </td>

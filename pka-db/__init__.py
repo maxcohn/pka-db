@@ -3,6 +3,15 @@ from . import db
 from . import utils
 import sqlite3
 import os
+from dotenv import load_dotenv
+
+# load environment variables
+load_dotenv()
+config = {
+    'ADMIN_USERNAME': os.getenv('ADMIN_USERNAME'),
+    'ADMIN_PASSWORD': os.getenv('ADMIN_PASSWORD')
+}
+
 app = Flask(__name__)
 
 #TODO have full db path laoded from .env
@@ -16,11 +25,12 @@ DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
 
 @app.route('/', methods=['GET'])
 def home():
+    '''Home page'''
     return render_template('base.html')
 
 @app.route('/about', methods=['GET'])
 def about():
-    #TODO add doc comment
+    '''About page'''
     return render_template('about.html')
 
 @app.route('/new-event', methods=['GET', 'POST'])
@@ -53,7 +63,7 @@ def admin():
     username = request.args.get('username')
     password = request.args.get('password')
 
-    if username != 'test_user' or password != 'test_pass':
+    if username != config['ADMIN_USERNAME'] or password != config['ADMIN_PASSWORD']:
         return ('', 401)
     
     if request.method == 'GET':
@@ -75,7 +85,7 @@ def admin():
     get_db().commit()
     cur.close()
     
-    return ('RAD', 401)
+    return ('RAD', 200)
 
 @app.route('/guest/id/<guest_id>', methods=['GET'])
 def get_guest(guest_id: int):

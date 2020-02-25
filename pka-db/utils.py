@@ -68,3 +68,4 @@ def get_show_id(show_name: str) -> int:
         return 2
     else:
         raise Exception(f'Invalid show identifier: "{show_name}"')
+

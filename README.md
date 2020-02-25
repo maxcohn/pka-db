@@ -18,6 +18,9 @@ would be used than more than just a handful of friends.
 
 ## TODO Getting the data#TODO how to download backup databases
 
+## TODO database structure
+
+## TODO environment variable
 
 ## Running
 

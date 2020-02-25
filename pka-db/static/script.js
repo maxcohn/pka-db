@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    //TODO maybe put this in its own script
-    document.querySelector('#submit-event').onclick = async () => {
+    //TODO maybe put this in its own script (new-event.js)
+    document.querySelector('#submit-event').onclick = async (e) => {
         let show = document.querySelector('#show-input').value;
         let episode = document.querySelector('#episode-input').value;
         let timestamp = document.querySelector('#timestamp-input').value.trim();
@@ -75,8 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 description,
             }),
         });
-
-        //window.open('/', '_self');
+        window.open('/', '_self');
     }
+
 });
 
