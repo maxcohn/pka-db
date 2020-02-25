@@ -4,6 +4,11 @@ https://pka-db.com
 
 A free and open source website database for Painkiller Already.
 
+If you want a copy of the data, let me know and I'll find the best way to host the
+sqlite database file or a series of CSVs representing the tables so that there can
+be mass downloads. Please don't attempt to scrape the website, it's on a cheap
+VPS and I'd be more than happy to supply someone with a raw copy.
+
 ## Why?
 
 PKA means a lot to me. I've been listening since late 2011. The show has had a
@@ -14,19 +19,47 @@ would be used than more than just a handful of friends.
 
 ## Goals
 
-## TODO how to suggest
+* Create an interactive archive of Painkiller Already
 
-## TODO Getting the data#TODO how to download backup databases
+## Planned Improvements
 
-## TODO database structure
+* Guest images
+* Guest bios
+* Random events on the homepage (maybe recent?)
+* Cleaning up design for guest lists on episodes and searches
+* CLeaning up design for episode lists on guests
 
-## TODO environment variable
+## Suggesting Additions/Improvements
 
-## Running
+Create an issue with the idea and I'll get around to it when I have the chance.
+If you have implementation ideas, please feel free to put them in the issue as well.
+As for whether this is going to be open contribution is up in the air at the moment.
+
+## Database Structure
+
+I don't claim to have any expertise in database design, so this might not be the
+greatest DDL you've ever seen, but it has been working well.
+
+Tables:
+* `show` - Mapping between id and show name.
+* `episodes` - Stores show (`PKA` or `PKN`), episode number, runtime, original
+airdate, and YouTube link (if applicable).
+* `guests` - Stores name and an id.
+* `events` - Stores a show and episode, a description/title of the event, and a
+timestamp that the event occurs at.
+* `appearances` - Appearance of a guest (show, episode, and their id)
+* `pending_events` - Same as events table, except this is where submitted events
+go until they are approved by the admin.
+
+## Running (development)
 
 Use the `run.sh` script to run the development server.
 
 ## Deploying
+
+The following environment variables must be set:
+* ADMIN_USERNAME
+* ADMIN_PASSWORD
 
 Run `docker build` in the current directory to build the Docker image and run it
 to have an active server. By defauly, the server runs on port 8001, so I'd recommend
@@ -34,4 +67,16 @@ using the following `docker run`:
 
 ```sh
 docker run -d -p 8001:8001 -m 200m <image name>
+```
+
+Directory structure (so you know where to put `main.db` and `.env`):
+```
+pka-db/
+    pka-db/
+        static/
+        templates/
+        *.py
+    .env
+    main.db
+    requirements.txt
 ```
