@@ -22,6 +22,11 @@ DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
 #===============================================================================
 # Routes
 #===============================================================================
+@app.errorhandler(404)
+def not_found(error):
+    '''404 page'''
+    return render_template('404.html'), 404
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -35,38 +40,41 @@ def about():
 
 @app.route('/new-event', methods=['GET', 'POST'])
 def new_event():
-    #TODO add doc comment
+    '''Add event page
+    
+    Users can use the page rendered via GET on this route to submit new events
+    to be added to the database.
+    '''
     if request.method == 'GET':
+        # if GET, render page
         return render_template('new-event.html')
 
-    
+    # add new event into database, pending for approval
     show = request.json['show']
     episode = request.json['episode']
     timestamp = request.json['timestamp']
     description = request.json['description']
 
-    #TODO abstract this
-    cur = get_db().cursor()
-    cur.execute('''
-    insert into pending_events
-    (show, episode, timestamp, description)
-    values (?,?,?,?)
-    ''', (utils.get_show_id(show), episode, timestamp, description))
-    cur.close()
-    get_db().commit()
+    db.add_event(get_db(), show, episode, timestamp, description)
+
     return ('', 201)
 
 @app.route('/admin', methods=['GET','POST'])
 def admin():
-    #TODO have this loaded from .env
-    #TODO clean this entire thing
+    '''Admin page
+
+    User for administrative tasks, currently including:
+    * Approving events
+    '''
     username = request.args.get('username')
     password = request.args.get('password')
 
     if username != config['ADMIN_USERNAME'] or password != config['ADMIN_PASSWORD']:
-        return ('', 401)
+        # if the user doesn't have the correct credentials, give them a 404
+        return render_template('404.html'), 404
     
     if request.method == 'GET':
+        # if GET, return a page with events pending approval
         cur = get_db().cursor()
         pending_events = db.all_pending_events(cur)
         cur.close()
@@ -74,21 +82,21 @@ def admin():
 
     
     event_id = request.json['id']
-    cur = get_db().cursor()
-    cur.execute('''
-    insert into events
-    (show, episode, timestamp, description)
-    select show, episode, timestamp, description from pending_events
-    where event_id = ?
-    ''', (event_id,))
-    cur.execute('delete from pending_events where event_id = ?', (event_id,))
-    get_db().commit()
-    cur.close()
+
+    # approve the event and move it from the pending table to the regular table
+    db.approve_pending_event(get_db(), event_id)
     
-    return ('RAD', 200)
+    return ('{"status":"success"}', 200)
 
 @app.route('/guest/id/<guest_id>', methods=['GET'])
 def get_guest(guest_id: int):
+    '''Guest page
+    
+    Renders a page representing a guest
+
+    Args:
+        guest_id (int): Guest id in the database
+    '''
     cur = get_db().cursor()
     
     # get list of dicts of episode appearances
@@ -116,6 +124,13 @@ def get_guest(guest_id: int):
 
 @app.route('/event/id/<event_id>', methods=['GET'])
 def get_event(event_id: int):
+    '''Event page
+
+    Renders a page representing an event
+
+    Args:
+        event_id (int): Event id in the database
+    '''
     cur = get_db().cursor()
     event = db.get_event_by_id(cur, event_id)
     yt_link = db.get_yt_link(cur, event['show'], event['episode'])
@@ -125,6 +140,13 @@ def get_event(event_id: int):
 
 @app.route('/guest/search/<search_str>', methods=['GET'])
 def guest_search(search_str: str):
+    '''Guest search
+
+    Searches the database for guests and renders a page for matching results
+
+    Args:
+        search_str (str): Search string
+    '''
     cur = get_db().cursor()
     all_results = db.guest_name_search(cur, search_str)
     cur.close()
@@ -136,12 +158,19 @@ def guest_search(search_str: str):
 
 @app.route('/event/search/<search_str>', methods=['GET'])
 def event_search(search_str: str):
+    '''Event search
+
+    Searches the database for events and renders a page for matching results
+
+    Args:
+        search_str (str): Search string
+    '''
     cur = get_db().cursor()
     all_results = db.event_search(cur, search_str)
     cur.close()
 
-    #if len(all_results) == 1:
-    #    return redirect(url_for('get_event', event_id=all_results[0]['id']))
+    if len(all_results) == 1:
+        return redirect(url_for('get_event', event_id=all_results[0]['id']))
 
     return render_template('event-search.html', search_str=search_str, event_list=all_results)
 
