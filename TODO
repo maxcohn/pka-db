@@ -1,18 +1,4 @@
-Document stuff that isn't documented after adding admin
-
-Clean code for admin
-add way for people to contribute
-
-
-add .env support
-
-
-make submit on new-event put the user back to the omepage
-    window.open('/', '_self')
-
-
-insert latest 2 pka episodes and last 50ish pkn
-    figure out which ones kyle was in prison for
+Add admin page for addming episodes and their guests
 
 convert abuse of dicts to proper DB models
 

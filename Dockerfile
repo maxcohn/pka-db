@@ -3,6 +3,7 @@ FROM python:3
 COPY pka-db/ /app/pka-db/
 COPY requirements.txt /app/requirements.txt
 COPY main.db /app/main.db
+COPY .env /app/.env
 
 WORKDIR /app/
 
