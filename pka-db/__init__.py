@@ -27,11 +27,6 @@ def not_found(error):
     '''404 page'''
     return render_template('404.html'), 404
 
-@app.errorhandler(204)
-def episode_not_found(error):
-    '''204 page'''
-    return render_template('204.html'), 204
-
 @app.errorhandler(500)
 def server_error(error):
     '''500 page'''
@@ -206,7 +201,7 @@ def get_pka_epsiode(show: str, episode):
         # get the youtube link if applicable
         yt_link = db.get_yt_link(cur, show, episode)
     except:
-        abort(204)
+        abort(404)
     finally:
         cur.close()
     
