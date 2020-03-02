@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g, redirect, url_for
+from flask import Flask, render_template, request, g, redirect, url_for, abort
 from . import db
 from . import utils
 import sqlite3
@@ -26,6 +26,11 @@ DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
 def not_found(error):
     '''404 page'''
     return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    '''500 page'''
+    return render_template('500.html'), 500
 
 
 @app.route('/', methods=['GET'])
@@ -184,19 +189,22 @@ def get_pka_epsiode(show: str, episode):
     '''
     show = show.lower()
     if show not in ('pka', 'pkn'):
-        return 'BAD' #TODO change this
+        abort(404)
 
     cur = get_db().cursor()
 
-    # get the list of quests on this episode
-    guest_list = db.all_episode_guests(cur, show, episode)
-    guest_list = [{'id': x[0], 'name': x[1]} for x in guest_list]
+    try:
+        # get the list of quests on this episode
+        guest_list = db.all_episode_guests(cur, show, episode)
+        guest_list = [{'id': x[0], 'name': x[1]} for x in guest_list]
 
-    # get the youtube link if applicable
-    yt_link = db.get_yt_link(cur, show, episode)
+        # get the youtube link if applicable
+        yt_link = db.get_yt_link(cur, show, episode)
+    except:
+        abort(404)
+    finally:
+        cur.close()
     
-    cur.close()
-
     return render_template(
         'episode.html',
         show_name=show.upper(),
