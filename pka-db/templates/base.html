@@ -21,15 +21,15 @@
     <span class="control">
       <span class="select">
         <select id='search-type'>
-          <option value='episode-pka'>Episode (PKA)</option>
-          <option value='episode-pkn'>Episode (PKN)</option>
-          <option value='guest'>Guest</option>
-          <option value='event'>Event</option>
+          <option value='episode-pka' {% if 'pka' in request.path %} selected {% endif %}>Episode (PKA)</option>
+          <option value='episode-pkn' {% if 'pkn' in request.path %} selected {% endif %}>Episode (PKN)</option>
+          <option value='guest' {% if 'guest' in request.path %} selected {% endif %}>Guest</option>
+          <option value='event' {% if 'event' in request.path %} selected {% endif %}>Event</option>
         </select>
       </span>
     </span>
     <span class="control">
-      <input class="input" type="text" id='search-box'>
+      <input class="input" type="text" id='search-box' value="{{ request.path.split('/')[-1] if 'search' in request.path else '' }}">
     </span>
     <span class="control">
       <button class="button" id='search-button'>Search</button>
