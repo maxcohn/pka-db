@@ -4,10 +4,9 @@ https://pka-db.com
 
 A free and open source website database for Painkiller Already.
 
-If you want a copy of the data, let me know and I'll find the best way to host the
-sqlite database file or a series of CSVs representing the tables so that there can
-be mass downloads. Please don't attempt to scrape the website, it's on a cheap
-VPS and I'd be more than happy to supply someone with a raw copy.
+Monthly backups of the database are hosted on the `releases` page of this repo.
+
+### **[If you want to contribute, please refer to the contribution guidelines](CONTRIBUTING.md)**
 
 ## Why?
 
@@ -25,9 +24,8 @@ would be used than more than just a handful of friends.
 
 * Guest images
 * Guest bios
-* Random events on the homepage (maybe recent?)
 * Cleaning up design for guest lists on episodes and searches
-* CLeaning up design for episode lists on guests
+* Cleaning up design for episode lists on guests
 
 ## Suggesting Additions/Improvements
 

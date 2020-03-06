@@ -257,10 +257,9 @@ def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
     '''
     max_event = cur.execute('select count(*) from events').fetchone()[0]
 
+    # get a series of random events
     event_ids = []
-
     for _ in range(num_events):
-        #TODOf ind better way to get without dupliocates
         eid = random.randint(0, max_event)
         while eid in event_ids:
             eid = random.randint(0, max_event)
@@ -284,8 +283,6 @@ def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
     } for event in events]
     
     
-
-
 
 #===============================================================================
 # Admin related
