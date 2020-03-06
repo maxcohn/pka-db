@@ -1,6 +1,7 @@
 '''DB interaction'''
 import sqlite3
 from typing import Tuple, List, Dict
+import random
 from . import utils
 
 #TODO figure out how to add 136.5
@@ -243,7 +244,48 @@ def add_event(conn: sqlite3.Connection, show: str, episode: int, timestamp: int,
     # commit changes and close cursor
     conn.commit()
     cur.close()
+
+def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
+    '''Get `num_events` events randomly from the database
+
+    Args:
+        cur (Cursor): Database cursor
+        event_id: Number of events to select randomly
+
+    Returns:
+        dict: List of dicts representing an event
+    '''
+    max_event = cur.execute('select count(*) from events').fetchone()[0]
+
+    event_ids = []
+
+    for _ in range(num_events):
+        #TODOf ind better way to get without dupliocates
+        eid = random.randint(0, max_event)
+        while eid in event_ids:
+            eid = random.randint(0, max_event)
+
+        event_ids.append(eid)
+
+    # construct a select statement with an arbitrary amount of '?' placeholders
+    # to allow us search for a sequence. This doesn't allow SQL injection because
+    # still use placeholders
+    events = cur.execute(f'''
+    select event_id, show, episode, timestamp, description from events
+    where event_id in ({','.join(['?' for _ in range(num_events)])})
+    ''', event_ids).fetchall()
+
+    return [{
+        'id': event[0],
+        'show': 'PKA' if event[1] == 1 else 'PKN',
+        'episode': event[2],
+        'timestamp': event[3],
+        'description': event[4], 
+    } for event in events]
     
+    
+
+
 
 #===============================================================================
 # Admin related

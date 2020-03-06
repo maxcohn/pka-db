@@ -35,8 +35,8 @@ header {
     border: 0;
 }
 
-.guest-search-table,
-.event-search-table {
+.guest-table,
+.event-table {
     margin-left: auto;
     margin-right: auto;
 }

@@ -60,6 +60,7 @@ Use the `run.sh` script to run the development server.
 The following environment variables must be set:
 * ADMIN_USERNAME
 * ADMIN_PASSWORD
+* DB_PATH
 
 Run `docker build` in the current directory to build the Docker image and run it
 to have an active server. By defauly, the server runs on port 8001, so I'd recommend

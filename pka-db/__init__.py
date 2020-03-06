@@ -9,15 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 config = {
     'ADMIN_USERNAME': os.getenv('ADMIN_USERNAME'),
-    'ADMIN_PASSWORD': os.getenv('ADMIN_PASSWORD')
+    'ADMIN_PASSWORD': os.getenv('ADMIN_PASSWORD'),
+    'DB_PATH': os.getenv('DB_PATH'),
 }
 
 app = Flask(__name__)
 
-#TODO have full db path laoded from .env
-# get current path and then up one to the database path
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_PATH = os.path.join(os.path.join(BASE_DIR, '..'), "main.db")
+DATABASE_PATH = config['DB_PATH']
 
 #===============================================================================
 # Routes
@@ -36,7 +34,10 @@ def server_error(error):
 @app.route('/', methods=['GET'])
 def home():
     '''Home page'''
-    return render_template('home.html')
+    cur = get_db().cursor()
+    event_list = db.random_events(cur, 5)
+    cur.close()
+    return render_template('home.html', event_list=event_list)
 
 @app.route('/about', methods=['GET'])
 def about():
