@@ -4,9 +4,8 @@
 
 {% block content %}
 
-  <!--TODO move this into its own file-->
   <script>
-    //TODO clean this entire process up
+    //TODO move this to it's own file
     const approve = async (id) => {
       await fetch(`/admin${window.location.search}`, {
         method: 'POST',
@@ -17,8 +16,20 @@
           id
         })
       });
+      window.location.reload();
+    }
 
-
+    const remove = async (id) => {
+      await fetch(`/admin${window.location.search}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id
+        })
+      });
+      window.location.reload();
     }
   </script>
   <table class='table event-table'>
@@ -45,6 +56,7 @@
           </td>
           <td>{{event['timestamp']}}</td>
           <td>
+            <button class='button' onclick='remove({{event["id"]}})'>Remove</button>
             <button class='button' onclick='approve({{event["id"]}})'>Approve</button>
           </td>
         </tr>

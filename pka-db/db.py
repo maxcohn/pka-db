@@ -289,8 +289,6 @@ def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
         'description': event[4], 
     } for event in events]
     
-    
-
 #===============================================================================
 # Admin related
 #===============================================================================
@@ -328,6 +326,22 @@ def approve_pending_event(conn: sqlite3.Connection, pending_id: int):
     (show, episode, timestamp, description)
     select show, episode, timestamp, description from pending_events
     where event_id = ?''', (pending_id,))
+
+    # remove the pending event from the pending_events table
+    cur.execute('delete from pending_events where event_id = ?', (pending_id,))
+
+    # commit to the database to make changes live
+    conn.commit()
+    cur.close()
+
+def remove_pending_event(conn: sqlite3.Connection, pending_id: int):
+    '''Remove a pending event
+
+    Args:
+        conn (Connection): DB connection
+        pending_id (int): Id of event in pending_events table to be removed
+    '''
+    cur = conn.cursor()
 
     # remove the pending event from the pending_events table
     cur.execute('delete from pending_events where event_id = ?', (pending_id,))

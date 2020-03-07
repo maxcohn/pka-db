@@ -65,7 +65,7 @@ def new_event():
 
     return ('', 201)
 
-@app.route('/admin', methods=['GET','POST'])
+@app.route('/admin', methods=['GET','POST', 'DELETE'])
 def admin():
     '''Admin page
 
@@ -89,8 +89,12 @@ def admin():
     
     event_id = request.json['id']
 
-    # approve the event and move it from the pending table to the regular table
-    db.approve_pending_event(get_db(), event_id)
+    if request.method == 'DELETE':
+        # if DELETE request, remove th event from the pending_events table
+        db.remove_pending_event(get_db(), event_id)
+    else:
+        # if POST, approve the event and move it from the pending table to the regular table
+        db.approve_pending_event(get_db(), event_id)
     
     return ('{"status":"success"}', 200)
 
