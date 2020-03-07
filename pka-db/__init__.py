@@ -201,6 +201,9 @@ def get_pka_epsiode(show: str, episode):
 
         # get the youtube link if applicable
         yt_link = db.get_yt_link(cur, show, episode)
+
+        event_list = db.all_episode_events(cur, show, episode)
+
     except:
         abort(404)
     finally:
@@ -211,7 +214,8 @@ def get_pka_epsiode(show: str, episode):
         show_name=show.upper(),
         episode=episode,
         guest_list=guest_list,
-        yt_link=yt_link
+        yt_link=yt_link,
+        event_list=event_list,
     )
 
 #===============================================================================

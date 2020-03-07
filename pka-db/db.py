@@ -11,25 +11,6 @@ from . import utils
 #===============================================================================
 # Episode related
 #===============================================================================
-
-def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[Tuple[int, str]]:
-    '''Get all events for a given episode
-
-    Args:
-        cur (Cursor): DB cursor.
-        show (str): Show name.
-        ep_num (int): Episode number.
-
-    Returns:
-        List[Tuple[int,str]]: List of events (tuples) in the format: (timestamp, event_description).
-    '''
-    show_id = utils.get_show_id(show)
-
-    return cur.execute('''
-    select timestamp, description from events
-    where show = ? and episode = ?
-    ''', (show_id, ep_num)).fetchall()
-
 def get_yt_link(cur: sqlite3.Cursor, show: str, ep_num: int) -> str:
     '''Get YouTube link for a given episode
 
@@ -167,6 +148,32 @@ def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
 #===============================================================================
 # Event related
 #===============================================================================
+def all_episode_events(cur: sqlite3.Cursor, show: str, ep_num: int) -> List[dict]:
+    '''Gets all events from a given episode
+
+    Args:
+        cur (Cursor): DB cursor.
+        show (str): Show name.
+        ep_num (int): Episode number.
+
+    Returns:
+        List[dict]: List of events
+    '''
+    show_id = utils.get_show_id(show)
+    
+    events = cur.execute('''
+    select event_id, show, episode, timestamp, description from events
+    where show = ? and episode = ?
+    ''', (show_id, ep_num)).fetchall()
+
+    return [{
+        'id': event[0],
+        'show': 'PKA' if event[1] == 1 else 'PKN',
+        'episode': event[2],
+        'timestamp': utils.sec_to_timestr(event[3]),
+        'description': event[4], 
+    } for event in events]
+
 def event_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
     '''Querys the database for events that match given string
 
@@ -217,7 +224,7 @@ def get_event_by_id(cur: sqlite3.Cursor, event_id: int) -> Dict:
         'id': event[0],
         'show': 'PKA' if event[1] == 1 else 'PKN',
         'episode': event[2],
-        'timestamp': event[3],
+        'timestamp': utils.sec_to_timestr(event[3]),
         'description': event[4], 
     }
 
@@ -278,7 +285,7 @@ def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
         'id': event[0],
         'show': 'PKA' if event[1] == 1 else 'PKN',
         'episode': event[2],
-        'timestamp': event[3],
+        'timestamp': utils.sec_to_timestr(event[3]),
         'description': event[4], 
     } for event in events]
     

@@ -22,3 +22,6 @@ Write a comment on the issue you want to work saying you're going to try it. Ple
 don't work on issues that people are already working on, it'll make things messy
 otherwise. If an issue is claimed and there is no progress after a couple days,
 comment and make a claim.
+
+Create a branch named after the feature/bug you're working on and its issue number,
+i.e. `random-events-3`.
