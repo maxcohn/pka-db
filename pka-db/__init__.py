@@ -61,6 +61,20 @@ def new_event():
     timestamp = request.json['timestamp']
     description = request.json['description']
 
+    # validate input
+    if show.lower not in ('pka', 'pkn'):
+        # if show name is invalid
+        return ('', 200)
+    elif episode < 0 or episode > 1000:
+        # if episode number is negative or rediculously high
+        return ('', 200)
+    elif timestamp < 60:
+        # if timestamp is earlier than a minute, it's most likely spam
+        return ('', 200)
+    elif len(description.strip()) < 5:
+        # if the description is too short
+        return ('', 200)
+
     db.add_event(get_db(), show, episode, timestamp, description)
 
     return ('', 201)
@@ -70,8 +84,10 @@ def admin():
     '''Admin page
 
     User for administrative tasks, currently including:
-    * Approving events
+    * Approving and denying submitted events
     '''
+
+    # validate that username and passowrd are correct
     username = request.args.get('username')
     password = request.args.get('password')
 
