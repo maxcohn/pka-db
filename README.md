@@ -61,12 +61,23 @@ The following environment variables must be set:
 * ADMIN_PASSWORD
 * DB_PATH
 
+If you want the automatic updates:
+* YT_API_KEY
+* SENDGRID_API_KEY
+
 Run `docker build` in the current directory to build the Docker image and run it
 to have an active server. By defauly, the server runs on port 8001, so I'd recommend
 using the following `docker run`:
 
 ```sh
 docker run -d -p 8001:8001 -m 200m <image name>
+```
+
+If you want to use the automatic updates, you need to run the script `get-newest-episode.py`.
+There are maby ways to go about automating this, but I chose to use a Cron Job
+on the host server that calls:
+```sh
+docker exec CONTAINER python3 /app/tools/get-newest-episode.py <params>
 ```
 
 Directory structure (so you know where to put `main.db` and `.env`):
