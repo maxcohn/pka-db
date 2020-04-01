@@ -7,8 +7,13 @@ To add a guest, use the query:
 or use the admin page that I hopefully build at this point
 
 
+API keys and the database path are stored as environment variables:
+    * DB_PATH
+    * YT_API_KEY
+    * SENDGRID_API_KEY
+
 Usage:
-    python <this-script> DB_PATH YT_API_KEY SENDGRID_API_KEY USER_EMAIL
+    python <this-script> USER_EMAIL
 
 Cron Job to run this with:
     0 17 * * 6 docker exec >/dev/null 2>&1
@@ -16,21 +21,21 @@ Cron Job to run this with:
     (every saturday at 5pm, no output)
 '''
 
-
-import requests
 import json
 import re
 from datetime import datetime
 import sys
 import sqlite3
+import os
 
+import requests
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-DB_PATH = sys.argv[1]
-YT_API_KEY = sys.argv[2]
-SENDGRID_API_KEY = sys.argv[3]
-USER_EMAIL = sys.argv[4]
+DB_PATH = os.getenv('DB_PATH')
+YT_API_KEY = os.getenv('YT_API_KEY')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+USER_EMAIL = sys.argv[1]
 
 LINE_RE = re.compile(r'^((\d+):\d+:\d+)\s*(-\s*)?(.*)$')
 WOODYS_CHANNEL_ID = 'UCIPVJoHb_A5S3kcv3TJlyEg'
