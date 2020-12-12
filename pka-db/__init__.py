@@ -44,41 +44,6 @@ def about():
     '''About page'''
     return render_template('about.html')
 
-@app.route('/new-event', methods=['GET', 'POST'])
-def new_event():
-    '''Add event page
-    
-    Users can use the page rendered via GET on this route to submit new events
-    to be added to the database.
-    '''
-    if request.method == 'GET':
-        # if GET, render page
-        return render_template('new-event.html')
-
-    # add new event into database, pending for approval
-    show = request.json['show']
-    episode = request.json['episode']
-    timestamp = request.json['timestamp']
-    description = request.json['description']
-
-    # validate input
-    if show.lower not in ('pka', 'pkn'):
-        # if show name is invalid
-        return ('', 200)
-    elif episode < 0 or episode > 1000:
-        # if episode number is negative or rediculously high
-        return ('', 200)
-    elif timestamp < 60:
-        # if timestamp is earlier than a minute, it's most likely spam
-        return ('', 200)
-    elif len(description.strip()) < 5:
-        # if the description is too short
-        return ('', 200)
-
-    db.add_event(get_db(), show, episode, timestamp, description)
-
-    return ('', 201)
-
 @app.route('/admin', methods=['GET','POST', 'DELETE'])
 def admin():
     '''Admin page
