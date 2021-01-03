@@ -123,7 +123,12 @@ def get_event(event_id: int):
         event_id (int): Event id in the database
     '''
     cur = get_db().cursor()
+    
     event = db.get_event_by_id(cur, event_id)
+    
+    # store the timstamp as seconds so we can use it in the embeded YT player
+    event['timestamp'] = utils.timestr_to_sec(event['timestamp'])
+
     yt_link = db.get_yt_link(cur, event['show'], event['episode'])
     cur.close()
 

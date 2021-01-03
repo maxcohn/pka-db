@@ -5,6 +5,7 @@ import random
 from . import utils
 
 #TODO figure out how to add 136.5
+#solution: episode numbers stored as strings instead. do this at some point
 
 
 
