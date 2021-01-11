@@ -15,7 +15,7 @@ config = {
 
 app = Flask(__name__)
 
-DATABASE_PATH = config['DB_PATH']
+DATABASE_PATH = config['DB_PATH'] if config['DB_PATH'] is not None else '/data/main.db'
 
 #===============================================================================
 # Routes
