@@ -201,11 +201,23 @@ def event_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
             description: description,
         }
     '''
-    wildcard_name = f'%{search_str}%'
+
+    # perform a prefix fts query
+    if search_str[-1] != '*':
+        search_str = search_str + '*'
+
+    # it looks like the order of the FTS query is perserved. If that isn't the case for some reason in the future, use something like
+    #select event_id, e.description, e.timestamp from events_fts INNER JOIN events e USING (event_id) WHERE events_fts MATCH 'prison' ORDER BY rank;
     all_results = cur.execute('''
-    select event_id, show, episode, timestamp, description from events
-    where description like ?
-    ''', (wildcard_name,)).fetchall()
+    select event_id, show, episode, timestamp, description
+    from events
+    inner join (
+        select event_id
+        from events_fts
+        where events_fts match ?
+        order by rank
+    ) using (event_id);
+    ''', (search_str,)).fetchall()
 
     return [{
         'id': res[0],
