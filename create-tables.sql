@@ -37,15 +37,6 @@ CREATE TABLE IF NOT EXISTS `appearances` (
 	FOREIGN KEY(`show`,`episode`) REFERENCES `episodes`(`show`,`episode`),
 	FOREIGN KEY(`guest_id`) REFERENCES `guests`(`guest_id`)
 );
-CREATE TABLE IF NOT EXISTS `pending_events` (
-	`event_id`	INTEGER,
-	`show`	INTEGER,
-	`episode`	INTEGER,
-	`timestamp`	INTEGER,
-	`description`	TEXT,
-	FOREIGN KEY(`show`,`episode`) REFERENCES `episodes`(`show`,`episode`),
-	PRIMARY KEY(`event_id`)
-);
 
 -- FTS5 tables
 

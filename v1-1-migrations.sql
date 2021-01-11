@@ -5,4 +5,4 @@ INSERT INTO events_fts (event_id, descriptions) SELECT event_id, descriptions FR
 INSERT INTO guests_fts (guest_id, name) SELECT guest_id, name FROM guests;
 
 
-
+DROP TABLE pending_events;

@@ -138,12 +138,21 @@ def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
             name: guest_name
         }
     '''
-    wildcard_name = f'%{search_str}%'
-    all_results = cur.execute('''
-    select guest_id, name from guests
-    where name like ?
-    ''', (wildcard_name,)).fetchall()
 
+    # add a prefix fts wildcard
+    if search_str[-1] != '*':
+        search_str = search_str + '*'
+    #wildcard_name = f'%{search_str}%'
+    #all_results = cur.execute('''
+    #select guest_id, name from guests
+    #where name like ?
+    #''', (wildcard_name,)).fetchall()
+    #
+    all_results = cur.execute('''
+    select guest_id, name from guests_fts
+    where name match ? order by rank;
+    ''', (search_str,)).fetchall()
+    
     return [{'id': res[0], 'name': res[1]} for res in all_results]
 
 #===============================================================================
