@@ -60,15 +60,15 @@ CREATE VIRTUAL TABLE IF NOT EXISTS guests_fts USING fts5(guest_id UNINDEXED, nam
 --TODO test these
 
 -- We need triggers to update the fts tables when their base tables are updated
-CREATE TRIGGER trig_events_after_insert AFTER INSERT ON events
+CREATE TRIGGER IF NOT EXISTS trig_events_after_insert AFTER INSERT ON events
 BEGIN
 	INSERT INTO events_fts (event_id, description) VALUES (new.event_id, new.description);
 END;
-CREATE TRIGGER trig_events_after_delete AFTER DELETE ON events
+CREATE TRIGGER IF NOT EXISTS trig_events_after_delete AFTER DELETE ON events
 BEGIN
 	DELETE FROM events_fts WHERE event_id = new.event_id;
 END;
-CREATE TRIGGER trig_events_after_update AFTER UPDATE ON events
+CREATE TRIGGER IF NOT EXISTS trig_events_after_update AFTER UPDATE ON events
 BEGIN
 	UPDATE events_fts
 	SET
@@ -79,15 +79,15 @@ BEGIN
 END;
 
 
-CREATE TRIGGER trig_guests_after_insert AFTER INSERT ON guests
+CREATE TRIGGER IF NOT EXISTS trig_guests_after_insert AFTER INSERT ON guests
 BEGIN
 	INSERT INTO guests_fts (guest_id, description) VALUES (new.guest_id, new.description);
 END;
-CREATE TRIGGER trig_guests_after_delete AFTER DELETE ON guests
+CREATE TRIGGER IF NOT EXISTS trig_guests_after_delete AFTER DELETE ON guests
 BEGIN
 	DELETE FROM guests_fts WHERE guest_id = new.guest_id;
 END;
-CREATE TRIGGER trig_guests_after_update AFTER UPDATE ON guests
+CREATE TRIGGER IF NOT EXISTS trig_guests_after_update AFTER UPDATE ON guests
 BEGIN
 	UPDATE guests_fts
 	SET
