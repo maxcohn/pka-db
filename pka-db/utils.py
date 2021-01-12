@@ -1,5 +1,6 @@
 import re
-from typing import Tuple
+from os import path
+from typing import Tuple, Set
 
 # regex for matching timestring with hours, minutes, and seconds being in capture groups
 _TIME_RE = re.compile(r'(\d+):(\d+):(\d+)')
@@ -69,3 +70,16 @@ def get_show_id(show_name: str) -> int:
     else:
         raise Exception(f'Invalid show identifier: "{show_name}"')
 
+def load_blacklist(blacklist_path: str) -> Set[str]:
+    '''Load the blacklist as a set of strings
+
+    Args:
+        blacklist_path (str): Path to the blacklist
+    Returns:
+        Set[str]: Set of blacklisted words. Is empty if the blacklist didn't exist
+    '''
+    if not path.exists(blacklist_path):
+        return set()
+
+    with open(blacklist_path) as f:
+        return set(f.read().split('\n'))

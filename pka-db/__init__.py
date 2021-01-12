@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, g, redirect, url_for, abort
 from . import db
 from . import utils
 import sqlite3
+import string
 import os
 from dotenv import load_dotenv
 
@@ -11,11 +12,19 @@ config = {
     'ADMIN_USERNAME': os.getenv('ADMIN_USERNAME'),
     'ADMIN_PASSWORD': os.getenv('ADMIN_PASSWORD'),
     'DB_PATH': os.getenv('DB_PATH'),
+    'BLACKLIST_PATH': os.getenv('BLACKLIST_PATH'),
 }
 
 app = Flask(__name__)
 
 DATABASE_PATH = config['DB_PATH'] if config['DB_PATH'] is not None else '/data/main.db'
+BLACKLIST_PATH = config['BLACKLIST_PATH'] if config['BLACKLIST_PATH'] is not None else '/data/blacklist.txt'
+
+# load the blacklist
+blacklist = utils.load_blacklist(BLACKLIST_PATH)
+
+# add literals to string.punctuation (mostly special quote characters)
+string.punctuation += '\u2019\u201d\u201c'
 
 #===============================================================================
 # Routes
@@ -35,9 +44,18 @@ def server_error(error):
 def home():
     '''Home page'''
     cur = get_db().cursor()
-    event_list = db.random_events(cur, 5)
+    event_list = db.random_events(cur, 10)
     cur.close()
-    return render_template('home.html', event_list=event_list)
+    
+    filtered_events = []
+
+    # filter events from blacklist
+    for event in event_list:
+        event_set = set(event['description'].lower().translate(str.maketrans('', '', string.punctuation)).split())
+        if len(event_set.intersection(blacklist)) == 0:
+            filtered_events.append(event)
+
+    return render_template('home.html', event_list=filtered_events)
 
 @app.route('/about', methods=['GET'])
 def about():
@@ -51,7 +69,7 @@ def admin():
     User for administrative tasks, currently including:
     * Approving and denying submitted events
     '''
-
+    #TODO: remove the current stuff and add ability to modify data directly
     # validate that username and passowrd are correct
     username = request.args.get('username')
     password = request.args.get('password')
@@ -165,10 +183,19 @@ def event_search(search_str: str):
     all_results = db.event_search(cur, search_str)
     cur.close()
 
-    if len(all_results) == 1:
-        return redirect(url_for('get_event', event_id=all_results[0]['id']))
+    filtered_results = []
 
-    return render_template('event-search.html', search_str=search_str, event_list=all_results)
+    # remove any events that are in the black list
+    for res in all_results:
+        event_set = set(res['description'].lower().translate(str.maketrans('', '', string.punctuation)).split())
+        if len(event_set.intersection(blacklist)) == 0:
+            filtered_results.append(res)
+
+
+    if len(filtered_results) == 1:
+        return redirect(url_for('get_event', event_id=filtered_results[0]['id']))
+
+    return render_template('event-search.html', search_str=search_str, event_list=filtered_results)
 
 @app.route('/<show>/<int:episode>', methods=['GET'])
 def get_pka_epsiode(show: str, episode):
