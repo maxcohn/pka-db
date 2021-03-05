@@ -16,9 +16,10 @@ Usage:
     python <this-script> USER_EMAIL
 
 Cron Job to run this with:
-    0 17 * * 6 docker exec >/dev/null 2>&1
+    0 21 * * 6 docker exec pka-db python3 /app/tools/get-newest-episode.py 'maxc4321@gmail.com'
 
-    (every saturday at 5pm, no output)
+
+    (every saturday at 5pm EST, no output)
 '''
 
 import json
