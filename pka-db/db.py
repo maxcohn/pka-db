@@ -5,6 +5,7 @@ import random
 from . import utils
 
 #TODO figure out how to add 136.5
+#solution: episode numbers stored as strings instead. do this at some point
 
 
 
@@ -137,12 +138,21 @@ def guest_name_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
             name: guest_name
         }
     '''
-    wildcard_name = f'%{search_str}%'
-    all_results = cur.execute('''
-    select guest_id, name from guests
-    where name like ?
-    ''', (wildcard_name,)).fetchall()
 
+    # add a prefix fts wildcard
+    if search_str[-1] != '*':
+        search_str = search_str + '*'
+    #wildcard_name = f'%{search_str}%'
+    #all_results = cur.execute('''
+    #select guest_id, name from guests
+    #where name like ?
+    #''', (wildcard_name,)).fetchall()
+    #
+    all_results = cur.execute('''
+    select guest_id, name from guests_fts
+    where name match ? order by rank;
+    ''', (search_str,)).fetchall()
+    
     return [{'id': res[0], 'name': res[1]} for res in all_results]
 
 #===============================================================================
@@ -191,11 +201,23 @@ def event_search(cur: sqlite3.Cursor, search_str: str) -> List[Dict]:
             description: description,
         }
     '''
-    wildcard_name = f'%{search_str}%'
+
+    # perform a prefix fts query
+    if search_str[-1] != '*':
+        search_str = search_str + '*'
+
+    # it looks like the order of the FTS query is perserved. If that isn't the case for some reason in the future, use something like
+    #select event_id, e.description, e.timestamp from events_fts INNER JOIN events e USING (event_id) WHERE events_fts MATCH 'prison' ORDER BY rank;
     all_results = cur.execute('''
-    select event_id, show, episode, timestamp, description from events
-    where description like ?
-    ''', (wildcard_name,)).fetchall()
+    select event_id, show, episode, timestamp, description
+    from events
+    inner join (
+        select event_id
+        from events_fts
+        where events_fts match ?
+        order by rank
+    ) using (event_id);
+    ''', (search_str,)).fetchall()
 
     return [{
         'id': res[0],
@@ -227,30 +249,6 @@ def get_event_by_id(cur: sqlite3.Cursor, event_id: int) -> Dict:
         'timestamp': utils.sec_to_timestr(event[3]),
         'description': event[4], 
     }
-
-def add_event(conn: sqlite3.Connection, show: str, episode: int, timestamp: int, description: str):
-    '''Adds an event to the database, in a pending state
-
-    Args:
-        conn (Connection): DB connection
-        show (str): Show name ('PKA' or 'PKN')
-        episode (int): Episode number
-        timestamp (int): Timestamp at which the event occurs (in seconds)
-        description (str): Description of the event
-    '''
-    # create a db cursor
-    cur = conn.cursor()
-
-    # add the event to the pending table
-    cur.execute('''
-    insert into pending_events
-    (show, episode, timestamp, description)
-    values (?,?,?,?)
-    ''', (utils.get_show_id(show), episode, timestamp, description))
-
-    # commit changes and close cursor
-    conn.commit()
-    cur.close()
 
 def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
     '''Get `num_events` events randomly from the database
@@ -292,60 +290,3 @@ def random_events(cur: sqlite3.Cursor, num_events: int) -> List[dict]:
 #===============================================================================
 # Admin related
 #===============================================================================
-def all_pending_events(cur: sqlite3.Cursor) -> List[Dict]:
-    '''Gets all events pending admin approval
-
-    Args:
-        cur (Cursor): DB cursor
-    '''
-    # fetch pending events from the database
-    all_events = cur.execute('select event_id, show, episode, timestamp, description from pending_events').fetchall()
-
-    #TODO clean this up, this is gross
-    return [{
-        'id': e[0],
-        'show': 'PKA' if e[1] == 1 else 'PKN',
-        'episode': e[2],
-        'timestamp': e[3],
-        'description': e[4],
-        'link': f'http://www.youtube.com/watch?v={get_yt_link(cur, "PKA" if e[1] == 1 else "PKN",e[2])}&t={e[3]}'
-    } for e in all_events]
-
-def approve_pending_event(conn: sqlite3.Connection, pending_id: int):
-    '''Approve a pending event by moving it to the regular events table
-
-    Args:
-        conn (Connection): DB connection
-        pending_id (int): Id of event in pending_events table to be moved
-    '''
-    cur = conn.cursor()
-
-    # insert pending event into the events table
-    cur.execute('''
-    insert into events
-    (show, episode, timestamp, description)
-    select show, episode, timestamp, description from pending_events
-    where event_id = ?''', (pending_id,))
-
-    # remove the pending event from the pending_events table
-    cur.execute('delete from pending_events where event_id = ?', (pending_id,))
-
-    # commit to the database to make changes live
-    conn.commit()
-    cur.close()
-
-def remove_pending_event(conn: sqlite3.Connection, pending_id: int):
-    '''Remove a pending event
-
-    Args:
-        conn (Connection): DB connection
-        pending_id (int): Id of event in pending_events table to be removed
-    '''
-    cur = conn.cursor()
-
-    # remove the pending event from the pending_events table
-    cur.execute('delete from pending_events where event_id = ?', (pending_id,))
-
-    # commit to the database to make changes live
-    conn.commit()
-    cur.close()

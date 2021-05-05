@@ -56,9 +56,7 @@ Use the `run.sh` script to run the development server.
 
 ## Deploying
 
-The following environment variables must be set:
-* ADMIN_USERNAME
-* ADMIN_PASSWORD
+The following environment variables can be set (don't worry if using docker):
 * DB_PATH
 
 If you want the automatic updates:
@@ -70,12 +68,17 @@ to have an active server. By defauly, the server runs on port 8001, so I'd recom
 using the following `docker run`:
 
 ```sh
-docker run -d -p 8001:8001 -m 200m <image name>
+docker run -d -p 8001:8001 -v "$PWD/main.db:/data/main.db" -v "$PWD/blacklist.txt:/data/blacklist.txt" -m 200m <image name>
 ```
+
+The use of `-m 200m` isn't necessary, but I do that to make sure it doesn't eat
+up too much ram since I run this next to a few other applications on a cheap VPS.
+
 
 If you want to use the automatic updates, you need to run the script `get-newest-episode.py`.
 There are maby ways to go about automating this, but I chose to use a Cron Job
 on the host server that calls:
+
 ```sh
 docker exec CONTAINER python3 /app/tools/get-newest-episode.py <params>
 ```

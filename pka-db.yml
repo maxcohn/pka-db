@@ -1,0 +1,14 @@
+version: "3.3"
+services:
+  pka-db:
+    image: "pka-db:latest"
+    volumes:
+      - ./main.db:/data/main.db
+      # If you don't want a black list, comment the below mount
+      - ./blacklist.txt:/data/blacklist.txt
+    ports:
+      - "8002:8001"
+    environment:
+      # Fill these in for automatic episode updates
+      YT_API_KEY: ""
+      SENDGRID_API_KEY: ""
