@@ -4,8 +4,16 @@ https://pka-db.com
 
 A free and open source website database for Painkiller Already.
 
+
 Monthly backups of the database are hosted on the [`releases`](https://github.com/maxcohn/pka-db/releases)
 page of this repo.
+
+## This project is no longer actively maintained
+
+I haven't touched this project since mid 2021 since there's not much to do.
+I don't see myself making any changes to this any time soon either.
+The website is still up and updating every week though!
+Feel free to do whatever you want with this.
 
 ### **[If you want to contribute, please refer to the contribution guidelines](CONTRIBUTING.md)**
 
