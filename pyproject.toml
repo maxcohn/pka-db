@@ -10,7 +10,7 @@ dev = 'FLASK_APP=pka-db flask run'
 [tool.poetry.dependencies]
 python = "^3.8"
 Flask = "^2.3.2"
-requests = "^2.25.1"
+requests = "^2.32.2"
 python-dotenv = "^0.15.0"
 
 [tool.poetry.dev-dependencies]
