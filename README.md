@@ -1,5 +1,11 @@
 # PKA DB
 
+**This project is archived**
+
+I don't listen to this show much anymore and don't want to continue running or hosting the service.
+
+---
+
 https://pka-db.com
 
 A free and open source website database for Painkiller Already.
